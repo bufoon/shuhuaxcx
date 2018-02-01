@@ -3,7 +3,7 @@ package com.rttx.protocol.rmq;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.rabbitmq.client.Channel;
-import com.rttx.common.utils.StringUtils;
+import com.rttx.commons.utils.StringUtils;
 import com.rttx.protocol.rmq.base.RMQMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
