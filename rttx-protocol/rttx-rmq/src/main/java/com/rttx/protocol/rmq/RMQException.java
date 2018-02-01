@@ -1,6 +1,7 @@
 package com.rttx.protocol.rmq;
 
-import com.rttx.common.exception.RttxException;
+
+import com.rttx.commons.exception.RttxException;
 
 public class RMQException extends RttxException {
     public RMQException() {
