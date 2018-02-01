@@ -1,0 +1,1 @@
+dubbosubscribe=com.rttx.protocol.dubbo.listener.ConsumerSubscribeListener

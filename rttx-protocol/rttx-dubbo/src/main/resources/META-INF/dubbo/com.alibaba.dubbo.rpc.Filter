@@ -1,0 +1,2 @@
+dubboconsumerstatics=com.rttx.protocol.dubbo.listener.ConsumerInvokeStaticsFilter
+dubboproviderstatics=com.rttx.protocol.dubbo.listener.ProviderInvokeStaticsFilter

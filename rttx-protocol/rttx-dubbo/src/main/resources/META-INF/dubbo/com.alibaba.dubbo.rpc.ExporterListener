@@ -1,0 +1,1 @@
+dubboexport=com.rttx.protocol.dubbo.listener.ProviderExportListener

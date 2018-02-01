@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.rttx.protocol.dubbo.DubboAutoConfiguration,\
+com.rttx.protocol.dubbo.DubboProviderAutoConfiguration,\
+com.rttx.protocol.dubbo.DubboConsumerAutoConfiguration
