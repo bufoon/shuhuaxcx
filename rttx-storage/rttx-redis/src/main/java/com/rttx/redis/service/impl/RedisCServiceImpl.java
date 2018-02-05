@@ -1,6 +1,7 @@
 package com.rttx.redis.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.rttx.commons.utils.StringUtils;
 import com.rttx.redis.service.RedisCService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,10 @@ public class RedisCServiceImpl implements RedisCService {
 
     @Override
     public <T> T getJsonObj(String key, Class<T> clazz) {
+        String obj = jedisCluster.get(key);
+        if (StringUtils.isEmpty(obj)){
+            return null;
+        }
         return JSON.parseObject(jedisCluster.get(key), clazz);
     }
 
