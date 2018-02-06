@@ -13,6 +13,7 @@ public class ResponseData<T> implements Serializable {
 
     private String code;
     private String msg;
+    private String desc;
     private T data;
 
     public ResponseData(){}
@@ -20,6 +21,13 @@ public class ResponseData<T> implements Serializable {
     public ResponseData(String code, String msg, T data) {
         this.code = code;
         this.msg = msg;
+        this.data = data;
+    }
+
+    public ResponseData(String code, String msg, String desc, T data) {
+        this.code = code;
+        this.msg = msg;
+        this.desc = desc;
         this.data = data;
     }
 
@@ -37,6 +45,14 @@ public class ResponseData<T> implements Serializable {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 
     public T getData() {
