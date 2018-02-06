@@ -7,6 +7,8 @@ import com.alibaba.dubbo.config.spring.ReferenceBean;
 import com.rttx.protocol.dubbo.annotation.DubboConsumer;
 import com.rttx.protocol.dubbo.annotation.EnableDubboConfiguration;
 import com.rttx.protocol.dubbo.domain.ClassIdBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @AutoConfigureAfter(DubboAutoConfiguration.class)
 @EnableConfigurationProperties(DubboProperties.class)
 public class DubboConsumerAutoConfiguration {
+  private Logger logger = LoggerFactory.getLogger(getClass());
   public static final Map<ClassIdBean, Object> DUBBO_REFERENCES_MAP =
       new ConcurrentHashMap<ClassIdBean, Object>();
 
@@ -104,7 +107,8 @@ public class DubboConsumerAutoConfiguration {
             }
           }
         } catch (Exception e) {
-          throw new BeanCreationException(beanName, e);
+          logger.warn(beanName, e);
+//          throw new BeanCreationException(beanName, e);
         }
         return bean;
       }

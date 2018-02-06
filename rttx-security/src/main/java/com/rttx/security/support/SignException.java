@@ -29,11 +29,15 @@ public class SignException extends RttxException {
         super(appId, data, message, cause, enableSuppression, writableStackTrace);
     }
 
-    public SignException(String appId, Integer exceptionCode, String message, Object data, Throwable cause) {
-        super(appId, exceptionCode, message, data, cause);
+    public SignException(String appId, String code, String message, Object data, Throwable cause) {
+        super(appId, code, message, data, cause);
     }
 
-    public SignException(String appId, Integer exceptionCode, String message) {
-        super(appId, exceptionCode, message);
+    public SignException(String appId, String code, String message, String desc, Object data, Throwable cause) {
+        super(appId, code, message, desc, data, cause);
+    }
+
+    public SignException(String appId, String code, String message) {
+        super(appId, code, message);
     }
 }
