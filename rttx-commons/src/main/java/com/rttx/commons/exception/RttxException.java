@@ -45,6 +45,9 @@ public class RttxException extends Exception {
     public RttxException(String appId, String code, String message) {
         this(appId, code, message, null, null);
     }
+    public RttxException(String appId, String code, String message, String desc) {
+        this(appId, code, message, desc, null, null);
+    }
 
     public String getAppId() {
         return appId;

@@ -1,7 +1,6 @@
 package com.rttx.commons.base;
 
 import com.rttx.commons.exception.RttxException;
-import com.sun.xml.internal.ws.api.model.CheckedException;
 
 /**
  * @Author: bufoon
