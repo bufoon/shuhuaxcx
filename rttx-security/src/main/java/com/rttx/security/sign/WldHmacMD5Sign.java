@@ -25,6 +25,6 @@ public class WldHmacMD5Sign extends HmacMD5Sign {
     @Override
     public String sign() throws SignException {
         super.setSortedParams(sortSignParams(getSignParams()));
-        return Hex.encodeHexString(hmacMD5Sign(buildSignParams(), getSignKey()));
+        return Hex.encodeHexString(hmacMD5Sign(buildSignParams(), getSignKey())).toUpperCase();
     }
 }

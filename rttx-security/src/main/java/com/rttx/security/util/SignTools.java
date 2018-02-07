@@ -153,9 +153,9 @@ public class SignTools {
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
         Pair<byte[], byte[]> pair = SignTools.generateKeyBytes();
-        System.out.println(Hex.encodeHexString(pair.getKey()));
-        System.out.println(Hex.encodeHexString(pair.getValue()));
-        System.out.println(Base64.getEncoder().encodeToString(Base64.getDecoder().decode(Base64.getEncoder().encodeToString(pair.getKey()))));
+//        System.out.println(Hex.encodeHexString(pair.getKey()));
+//        System.out.println(Hex.encodeHexString(pair.getValue()));
+//        System.out.println(Base64.getEncoder().encodeToString(Base64.getDecoder().decode(Base64.getEncoder().encodeToString(pair.getKey()))));
         System.out.println(Base64.getEncoder().encodeToString(pair.getKey()) + ", \n privateKey: \n" + Base64.getEncoder().encodeToString(pair.getValue()));
     }
 }
