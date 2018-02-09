@@ -1,9 +1,7 @@
 package com.rttx.commons.exception;
 
-import org.apache.commons.lang3.time.DateFormatUtils;
-
 public class RttxException extends Exception {
-    private String appId;
+    private Integer prodId;
     private String code;
     private Object data;
     private String desc;
@@ -24,37 +22,37 @@ public class RttxException extends Exception {
         super(cause);
     }
 
-    protected RttxException(String appId, Object data, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected RttxException(Integer prodId, Object data, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
-        this.appId = appId;
+        this.prodId = prodId;
         this.data = data;
     }
 
-    public RttxException(String appId, String code, String message, Object data, Throwable cause) {
+    public RttxException(Integer prodId, String code, String message, Object data, Throwable cause) {
         super(message, cause);
-        this.appId = appId;
+        this.prodId = prodId;
         this.code = code;
         this.data = data;
     }
 
-    public RttxException(String appId, String code, String message, String desc, Object data, Throwable cause) {
-        this(appId, code, message, data, cause);
+    public RttxException(Integer prodId, String code, String message, String desc, Object data, Throwable cause) {
+        this(prodId, code, message, data, cause);
         this.desc = desc;
     }
 
-    public RttxException(String appId, String code, String message) {
-        this(appId, code, message, null, null);
+    public RttxException(Integer prodId, String code, String message) {
+        this(prodId, code, message, null, null);
     }
-    public RttxException(String appId, String code, String message, String desc) {
-        this(appId, code, message, desc, null, null);
-    }
-
-    public String getAppId() {
-        return appId;
+    public RttxException(Integer prodId, String code, String message, String desc) {
+        this(prodId, code, message, null, null);
     }
 
-    public void setAppId(String appId) {
-        this.appId = appId;
+    public Integer getProdId() {
+        return prodId;
+    }
+
+    public void setProdId(Integer prodId) {
+        this.prodId = prodId;
     }
 
     public String getCode() {

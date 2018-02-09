@@ -25,19 +25,23 @@ public class SignException extends RttxException {
         super(cause);
     }
 
-    public SignException(String appId, Object data, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(appId, data, message, cause, enableSuppression, writableStackTrace);
+    public SignException(Integer prodId, Object data, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(prodId, data, message, cause, enableSuppression, writableStackTrace);
     }
 
-    public SignException(String appId, String code, String message, Object data, Throwable cause) {
-        super(appId, code, message, data, cause);
+    public SignException(Integer prodId, String code, String message, Object data, Throwable cause) {
+        super(prodId, code, message, data, cause);
     }
 
-    public SignException(String appId, String code, String message, String desc, Object data, Throwable cause) {
-        super(appId, code, message, desc, data, cause);
+    public SignException(Integer prodId, String code, String message, String desc, Object data, Throwable cause) {
+        super(prodId, code, message, desc, data, cause);
     }
 
-    public SignException(String appId, String code, String message) {
-        super(appId, code, message);
+    public SignException(Integer prodId, String code, String message) {
+        super(prodId, code, message);
+    }
+
+    public SignException(Integer prodId, String code, String message, String desc) {
+        super(prodId, code, message, desc);
     }
 }

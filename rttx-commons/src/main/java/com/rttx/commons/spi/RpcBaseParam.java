@@ -10,13 +10,13 @@ public class RpcBaseParam {
     /**
      * 项目应用ID
      */
-    private String proId;
+    private Integer proId;
 
-    public String getProId() {
+    public Integer getProId() {
         return proId;
     }
 
-    public void setProId(String proId) {
+    public void setProId(Integer proId) {
         this.proId = proId;
     }
 }

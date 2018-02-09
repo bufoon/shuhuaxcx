@@ -17,6 +17,21 @@ public class SpiUtils {
      * @return
      */
     public static boolean isSuccess(ResponseData responseData){
+        if (responseData == null){
+            responseData = new ResponseData(ResEnum.SYSTEM_ERROR, null);
+        }
+        return (responseData != null && ResEnum.SUCCESS.getCode().equals(responseData.getCode()));
+    }
+
+    /**
+     *  判断Dubbo服务响应是否成功
+     * @param responseData
+     * @return
+     */
+    public static boolean isDataSuccess(ResponseData responseData){
+        if (responseData == null){
+            responseData = new ResponseData(ResEnum.SYSTEM_ERROR, null);
+        }
         return (responseData != null && ResEnum.SUCCESS.getCode().equals(responseData.getCode()) && responseData.getData() != null );
     }
 }

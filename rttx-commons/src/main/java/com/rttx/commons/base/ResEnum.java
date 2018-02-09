@@ -14,7 +14,7 @@ public enum ResEnum {
     SUCCESS("000000", "Success", "成功"),
     FAIL("000001", "Fail", "失败"),
     SYSTEM_ERROR("000002", "System Error", "系统错误"),
-    PARAMS_INVALID("000003", "Params Invalid", "基本参数不合法"),
+    PARAMS_NULL("000003", "Params Null", "必填参数为空"),
     UNKNOWN_ERROR("000004", "Unknow Error", "未知错误")
     ;
 

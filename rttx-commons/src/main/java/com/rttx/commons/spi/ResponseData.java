@@ -1,5 +1,7 @@
 package com.rttx.commons.spi;
 
+import com.rttx.commons.base.ResEnum;
+
 import java.io.Serializable;
 
 /**
@@ -29,6 +31,10 @@ public class ResponseData<T> implements Serializable {
         this.msg = msg;
         this.desc = desc;
         this.data = data;
+    }
+
+    public ResponseData(ResEnum resEnum, T data) {
+        this(resEnum.getCode(), resEnum.getMsg(), resEnum.getDesc(), data);
     }
 
     public String getCode() {
