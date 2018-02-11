@@ -14,7 +14,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@ConditionalOnProperty(name = "com.rttx.storage.mysql.read", havingValue = "datasource")
+@ConditionalOnProperty(name = "rttx.storage.mysql.read", havingValue = "datasource")
 @MapperScan(basePackages = {"com.rttx.**.mapper.read"}, sqlSessionFactoryRef = "readSqlSessionFactoryBean")
 public class ReadDsDruidConfig {
 
