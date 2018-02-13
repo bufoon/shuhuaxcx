@@ -51,6 +51,12 @@ public class ZkServiceImpl implements ZkService {
     }
 
     @Override
+    public <V> String getData(String path, AtomicReference<V> v, final V defaultValue) {
+        nodeDataChange(path, v, defaultValue);
+        return getData(path);
+    }
+
+    @Override
     public void setData(String path, String data) {
         try {
             Stat stat = curatorFramework.setData().forPath(getPath(path), data.getBytes(Charset.defaultCharset()));
@@ -132,6 +138,6 @@ public class ZkServiceImpl implements ZkService {
     }
     @Override
     public String getPath(String path){
-        return configPath + appName + path;
+        return configPath + path;
     }
 }

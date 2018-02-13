@@ -12,7 +12,22 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public interface ZkService {
 
+    /**
+     * 根据路径获取数据
+     * @param path
+     * @return
+     */
     String getData(String path);
+
+    /**
+     * 获取数据，并设置监听路径数据变化
+     * @param path
+     * @param v
+     * @param defaultValue
+     * @param <V>
+     * @return
+     */
+    <V> String getData(String path, AtomicReference<V> v, final V defaultValue);
 
     void setData(String path, String data);
 

@@ -32,7 +32,6 @@ public class NodeCacheGenericListener<V> implements NodeCacheListener {
         if (StringUtils.isEmpty(data)){
             data = defaultValue;
         }
-        System.out.println("==============================================================,data: " + data);
         v.set(data);
     }
 }
