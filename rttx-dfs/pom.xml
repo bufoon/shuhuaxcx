@@ -12,5 +12,11 @@
     <groupId>com.rttx</groupId>
     <artifactId>rttx-dfs</artifactId>
 
-
+    <dependencies>
+        <dependency>
+            <groupId>com.rttx</groupId>
+            <artifactId>rttx-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>
