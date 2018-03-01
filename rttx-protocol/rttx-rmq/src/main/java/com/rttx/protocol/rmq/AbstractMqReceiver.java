@@ -1,6 +1,7 @@
 package com.rttx.protocol.rmq;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.rabbitmq.client.Channel;
 import com.rttx.commons.utils.StringUtils;
@@ -47,6 +48,18 @@ public abstract class AbstractMqReceiver<T> implements MqReceiver<T> {
         // 处理是否应答
         ackAction(deliveryTag, channel, handle);
 
+
+    }
+
+    /**
+     * 数据转换
+     * @param data
+     * @param clazz
+     * @return
+     */
+    protected <T> T dataConverter(String data, Class<T> clazz) {
+
+        return JSON.parseObject(data, clazz);
 
     }
 

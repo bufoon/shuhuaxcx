@@ -1,5 +1,9 @@
 package com.rttx.commons.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.rttx.commons.base.OpenApiResponse;
+import com.rttx.commons.base.ResEnum;
+
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -33,6 +37,43 @@ public class ObjectMapUtils {
             map.put(fieldName, value);
         }
         return map;
+    }
+
+    /**
+     * 通过反射将对象转MAP
+     * @param obj
+     * @param isContain 是否包含 properties , true 生成properties， false 去除properties
+     * @param properties
+     * @return
+     * @throws IllegalAccessException
+     */
+    public static Map<String, Object> objectToMap(Object obj, boolean isContain, Object ...properties) throws IllegalAccessException {
+        Map<String, Object> map = new HashMap<>();
+        Class<?> clazz = obj.getClass();
+        for (Field field : clazz.getDeclaredFields()) {
+            field.setAccessible(true);
+            String fieldName = field.getName();
+            Object value = field.get(obj);
+            if (properties != null && value != null && !"serialVersionUID".equalsIgnoreCase(fieldName)){
+                if (isContain && contain(fieldName, properties)){
+                    map.put(fieldName, value);
+                } else if (!isContain && !contain(fieldName, properties)){
+                    map.put(fieldName, value);
+                }
+            }
+        }
+        return map;
+    }
+
+    private static boolean contain(String field, Object ...args){
+        boolean bool = false;
+        for (int i = 0; i< args.length; i++){
+            if (field.equals(args[i])){
+                bool = true;
+                break;
+            }
+        }
+        return bool;
     }
 
     /**
