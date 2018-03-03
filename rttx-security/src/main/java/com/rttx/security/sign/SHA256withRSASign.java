@@ -29,7 +29,7 @@ public class SHA256withRSASign extends AbstractSign implements Sign {
     @Override
     public String sign() throws SignException {
         super.setSortedParams(sortSignParams(getSignParams()));
-        return Base64.getEncoder().encodeToString(SignTools.sha256WithRsaSign(Base64.getDecoder().decode(getSignKey()), buildSignParams()));
+        return Base64.getEncoder().encodeToString(SignTools.sha256WithRsaSign(Base64.getDecoder().decode(getSignKey()), this.buildSignParams()));
     }
 
     public static void main(String[] args) throws IllegalAccessException, NoSuchAlgorithmException, SignException {

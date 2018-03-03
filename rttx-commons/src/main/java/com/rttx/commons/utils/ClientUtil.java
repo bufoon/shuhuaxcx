@@ -1,5 +1,6 @@
 package com.rttx.commons.utils;
 
+import org.apache.commons.lang.CharSet;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -49,7 +50,7 @@ public class ClientUtil {
         try {
             if(!"".equals(JSONStr) && JSONStr!=null && JSONStr.length()>2){
 
-                    httppost.setEntity(new StringEntity(JSONStr));
+                    httppost.setEntity(new StringEntity(JSONStr, "UTF-8"));
             }
             response = httpclient.execute(httppost);
             int code = response.getStatusLine().getStatusCode();
@@ -91,7 +92,7 @@ public class ClientUtil {
             // 通过请求对象获取响应对象
            response = httpClient.execute(request);
 
-           result = EntityUtils.toString(response.getEntity(),"utf-8");
+           result = EntityUtils.toString(response.getEntity(),"UTF-8");
             // 判断网络连接状态码是否正常(0--200都数正常)
 //            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
 //                result= EntityUtils.toString(response.getEntity(),"utf-8");
