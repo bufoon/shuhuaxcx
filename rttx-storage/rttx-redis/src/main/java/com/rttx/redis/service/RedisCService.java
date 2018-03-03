@@ -12,12 +12,14 @@ import redis.clients.jedis.MultiKeyJedisClusterCommands;
 public interface RedisCService extends JedisCommands, MultiKeyJedisClusterCommands {
 
     /**
-     * 设置对象，JSON序列化
+     * 设置json序列化串
      * @param key
      * @param t
+     * @param time 单位秒
      * @param <T>
+     * @return
      */
-    <T> String setJsonObj(String key, T t);
+    <T> String setJsonObj(String key, T t, long time);
 
     /**
      * 获取JSON序列化对象

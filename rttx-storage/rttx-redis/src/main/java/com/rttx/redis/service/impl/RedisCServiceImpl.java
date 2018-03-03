@@ -27,8 +27,11 @@ public class RedisCServiceImpl implements RedisCService {
     private JedisCluster jedisCluster;
 
     @Override
-    public <T> String setJsonObj(String key, T t) {
-       return jedisCluster.set(key, JSON.toJSONString(t));
+    public <T> String setJsonObj(String key, T t, long time) {
+        if (time > 0){
+            return this.set(key, JSON.toJSONString(t), "NX", "EX", time);
+        }
+        return this.set(key, JSON.toJSONString(t));
     }
 
     @Override
