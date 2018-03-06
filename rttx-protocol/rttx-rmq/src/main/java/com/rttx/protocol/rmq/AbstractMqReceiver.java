@@ -1,11 +1,11 @@
 package com.rttx.protocol.rmq;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.rabbitmq.client.Channel;
 import com.rttx.commons.utils.StringUtils;
 import com.rttx.protocol.rmq.base.RMQMessage;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -34,22 +34,38 @@ public abstract class AbstractMqReceiver<T> implements MqReceiver<T> {
         // 获取字符串数据
         String data = new String(message, Charset.defaultCharset());
         if (StringUtils.isEmpty(data)){
+            logger.error("receive data is empty.");
             throw new RMQException("receive data is empty.");
         }
-        RMQMessage<T> rmqMessage = null;
+        RMQMessage<String> rmqMessage = null;
         try {
             // 数据转换
-            rmqMessage = JSON.parseObject(data, new TypeReference<RMQMessage<T>>(){});
+            rmqMessage = JSON.parseObject(data, new TypeReference<RMQMessage<String>>(){});
+            logger.info("receive rabbit mq info: \n{}", JSON.toJSONString(rmqMessage));
         } catch (Exception e) {
+            logger.error("received data connot convert valid Message.{}", ExceptionUtils.getStackTrace(e));
             throw new RMQException("received data connot convert valid Message.", e);
         }
         // 消息处理
-        boolean handle = handle(rmqMessage);
+        T t = null;
+        try {
+            t = JSON.parseObject(rmqMessage.getData(), this.childHandleClass());
+        } catch (Exception e) {
+            logger.error("received data connot convert valid Message.{}", ExceptionUtils.getStackTrace(e));
+            throw new RMQException("received data connot convert valid Message.", e);
+        }
+        boolean handle = handle(t);
         // 处理是否应答
         ackAction(deliveryTag, channel, handle);
 
 
     }
+
+    /**
+     * 子类 类型，必须实现
+     * @return
+     */
+    protected abstract Class<T> childHandleClass();
 
     /**
      * 数据转换
@@ -69,7 +85,7 @@ public abstract class AbstractMqReceiver<T> implements MqReceiver<T> {
      * @param channel
      * @param handleStatus
      */
-    protected void ackAction(long deliveryTag, Channel channel, boolean handleStatus){
+    protected void ackAction(long deliveryTag, Channel channel, boolean handleStatus) throws RMQException {
         try {
             if (handleStatus){
                 channel.basicAck(deliveryTag, false);
@@ -77,7 +93,7 @@ public abstract class AbstractMqReceiver<T> implements MqReceiver<T> {
                 channel.basicNack(deliveryTag, false, true);
             }
         } catch (IOException e) {
-           e.printStackTrace();
+            throw new RMQException("message confirm fail.", e);
         }
     }
 
