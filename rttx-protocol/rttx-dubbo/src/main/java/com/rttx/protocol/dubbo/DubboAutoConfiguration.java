@@ -15,6 +15,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+
 /**
  * Dubbo common configuration
  *
@@ -51,10 +55,51 @@ public class DubboAutoConfiguration {
     if (protocolConfig == null){
       protocolConfig = new ProtocolConfig();
       protocolConfig.setName("dubbo");
-      protocolConfig.setPort(Integer.valueOf("6" +  + appInfo.getId()));
+      protocolConfig.setPort(getPort(Integer.valueOf("6" + appInfo.getId())));
       protocolConfig.setThreads(200);
     }
+    protocolConfig.setPort(getPort(Integer.valueOf("6" + protocolConfig.getPort())));
     return protocolConfig;
+  }
+
+  private Integer getPort(Integer p){
+    Integer port = 0;
+    try{
+      if(isPortAvailable(p)){
+        port = p;
+      }else{
+        for(int i = 5; i < 10;i++){
+          p += 5;
+          if(isPortAvailable(p)){
+            port = p;
+            break;
+          }
+        }
+      }
+    }catch(Exception e){
+      e.printStackTrace();
+    }
+    return port;
+  }
+
+  public static boolean isPortAvailable(int port) {
+    try {
+      bindPort("0.0.0.0", port);
+      bindPort(InetAddress.getLocalHost().getHostAddress(), port);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  private static void bindPort(String host, int port) throws Exception {
+    Socket s = new Socket();
+    try {
+      s.bind(new InetSocketAddress(host, port));
+    } finally {
+      s.close();
+    }
+
   }
 
   @Bean
