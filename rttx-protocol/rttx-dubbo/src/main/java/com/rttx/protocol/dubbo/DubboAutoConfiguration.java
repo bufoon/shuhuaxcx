@@ -55,10 +55,10 @@ public class DubboAutoConfiguration {
     if (protocolConfig == null){
       protocolConfig = new ProtocolConfig();
       protocolConfig.setName("dubbo");
-      protocolConfig.setPort(getPort(Integer.valueOf("6" + appInfo.getId())));
+      protocolConfig.setPort(getPort(Integer.valueOf("5" + appInfo.getId())));
       protocolConfig.setThreads(200);
     }
-    protocolConfig.setPort(getPort(Integer.valueOf("6" + protocolConfig.getPort())));
+    protocolConfig.setPort(getPort(Integer.valueOf("5" + protocolConfig.getPort())));
     return protocolConfig;
   }
 
