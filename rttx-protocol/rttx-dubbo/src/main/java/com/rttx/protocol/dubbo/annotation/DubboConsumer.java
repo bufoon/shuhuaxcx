@@ -18,7 +18,7 @@ public @interface DubboConsumer {
   String version() default "";
 
   // 远程调用超时时间(毫秒)
-  int timeout() default 0;
+  int timeout() default 3000;
 
   // 注册中心
   String registry() default "";

@@ -3,6 +3,7 @@ package com.rttx.commons.utils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -43,5 +44,22 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
             e.printStackTrace();
         }
         return -1;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(8&127);
+        int a= 10;
+        //十进制 -> 二进制
+        String str = Integer.toBinaryString(a);
+        while(str.length() < 32){
+            str = 0 + str;
+        }
+        System.out.println(str);
+
+        //二进制 -> 十进制
+
+        str = "1111111"; //补0
+        System.out.println(Integer.parseInt(str, 2));
+
     }
 }

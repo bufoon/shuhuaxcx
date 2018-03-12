@@ -28,10 +28,11 @@ public class RedisCServiceImpl implements RedisCService {
 
     @Override
     public <T> String setJsonObj(String key, T t, long time) {
+        String str = this.set(key, JSON.toJSONString(t));
         if (time > 0){
-            return this.set(key, JSON.toJSONString(t), "NX", "EX", time);
+            this.expire(key, Long.valueOf(time).intValue());
         }
-        return this.set(key, JSON.toJSONString(t));
+        return str;
     }
 
     @Override

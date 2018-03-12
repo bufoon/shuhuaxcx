@@ -138,6 +138,9 @@ public class ZkServiceImpl implements ZkService {
     }
     @Override
     public String getPath(String path){
+        if (path.indexOf("AppConfig") != -1){
+            return path;
+        }
         return configPath + path;
     }
 }
