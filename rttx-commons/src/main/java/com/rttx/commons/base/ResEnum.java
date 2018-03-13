@@ -16,6 +16,7 @@ public enum ResEnum {
     SYSTEM_ERROR("000002", "System Error", "系统错误"),
     PARAMS_NULL("000003", "Params Null", "必填参数为空"),
     UNKNOWN_ERROR("000004", "Unknow Error", "未知错误")
+
     ;
 
     ResEnum(String code, String msg, String desc) {

@@ -1,10 +1,13 @@
 package com.rttx.mongo.config;
 
+import com.mongodb.MongoClient;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 
 /**
  * @Author: bufoon
@@ -21,4 +24,5 @@ public class MongoDbConfig {
     public MongoProperties mongoProperties(){
         return new MongoProperties();
     }
+
 }
