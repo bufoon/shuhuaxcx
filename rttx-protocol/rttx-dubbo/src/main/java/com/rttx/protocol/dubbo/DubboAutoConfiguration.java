@@ -68,7 +68,7 @@ public class DubboAutoConfiguration {
       if(isPortAvailable(p)){
         port = p;
       }else{
-        for(int i = 5; i < 10;i++){
+        for(int i = 1; i < 20;i++){
           p += 5;
           if(isPortAvailable(p)){
             port = p;

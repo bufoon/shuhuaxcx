@@ -73,7 +73,7 @@ public class DubboProviderAutoConfiguration {
     }
     String group = service.group();
     if (group == null || "".equals(group)) {
-      group = "rttx-risk";
+      group = "risk_default";
     }
     if (group != null && !"".equals(group)) {
       serviceConfig.setGroup(group);
