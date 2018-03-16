@@ -27,7 +27,7 @@ public interface ZkService {
      * @param <V>
      * @return
      */
-    <V> String getData(String path, AtomicReference<V> v, final V defaultValue);
+    <V> V getData(String path, AtomicReference<V> v, final V defaultValue);
 
     void setData(String path, String data);
 

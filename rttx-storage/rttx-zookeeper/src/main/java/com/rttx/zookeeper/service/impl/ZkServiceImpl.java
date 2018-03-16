@@ -1,12 +1,12 @@
 package com.rttx.zookeeper.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.rttx.commons.utils.StringUtils;
 import com.rttx.zookeeper.service.ZkService;
 import com.rttx.zookeeper.support.NodeCacheGenericListener;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.NodeCache;
-import org.apache.curator.framework.recipes.cache.NodeCacheListener;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
@@ -39,21 +41,62 @@ public class ZkServiceImpl implements ZkService {
     @Autowired
     private CuratorFramework curatorFramework;
 
+    private final String COMMONS_PATH= "/AppConfig/RTTX/RISK/commons/";
+
     @Override
     public String getData(String path) {
+        byte[] data = null;
         try {
-            byte[] data = curatorFramework.getData().forPath(getPath(path));
+            data = curatorFramework.getData().forPath(getPath(path));
             return new String(data, Charset.defaultCharset());
         } catch (Exception e) {
             logger.error("zk getData is error {}", ExceptionUtils.getStackTrace(e));
+        } finally {
+            if (data == null && StringUtils.isNotEmpty(path) && path.indexOf("commons") != -1){
+                return getData(COMMONS_PATH+path);
+            }
         }
         return "";
     }
 
     @Override
-    public <V> String getData(String path, AtomicReference<V> v, final V defaultValue) {
-        nodeDataChange(path, v, defaultValue);
-        return getData(path);
+    public <V> V getData(String path, AtomicReference<V> v, final V defaultValue) {
+        V value = null;
+        try {
+            Object data = getData(path);
+            if (defaultValue instanceof Byte) {
+                value = (V) (Byte.valueOf(String.valueOf(data)));
+            } else if (defaultValue instanceof Boolean) {
+                boolean bol = "1".equals(String.valueOf(data)) || "true".equalsIgnoreCase(String.valueOf(data));
+                value = (V) (Boolean.valueOf(bol));
+            } else if (defaultValue instanceof Short) {
+                value = (V) (Short.valueOf(String.valueOf(data)));
+            } else if (defaultValue instanceof Long) {
+                value = (V) (Long.valueOf(String.valueOf(data)));
+            } else if (defaultValue instanceof Float) {
+                value = (V) (Float.valueOf(String.valueOf(data)));
+            } else if (defaultValue instanceof Double) {
+                value = (V) (Double.valueOf(String.valueOf(data)));
+            } else if (defaultValue instanceof BigDecimal) {
+                value = (V) (new BigDecimal(String.valueOf(data)));
+            } else if (defaultValue instanceof Integer) {
+                value = (V) (Integer.valueOf(String.valueOf(data)));
+            } else if (defaultValue instanceof BigInteger) {
+                value = (V) (new BigInteger(String.valueOf(data)));
+            } else {
+                value = (V) data;
+            }
+            NodeCache nodeCache = new NodeCache(curatorFramework, getPath(path));
+            nodeCache.getListenable().addListener(new NodeCacheGenericListener<>(v, defaultValue, nodeCache));
+            nodeCache.start();
+        } catch (Exception e) {
+            logger.error("data change error. {}", ExceptionUtils.getStackTrace(e));
+        } finally {
+            if (StringUtils.isEmpty(value) && StringUtils.isNotEmpty(path) && path.indexOf("commons") < 0){
+                return getData(COMMONS_PATH + path, v, defaultValue);
+            }
+        }
+        return value;
     }
 
     @Override

@@ -143,7 +143,7 @@ public class DubboConsumerAutoConfiguration {
     }
     String group = dubboConsumer.group();
     if (group == null || "".equals(group)) {
-      group = "rttx-risk";
+      group = "risk_default";
     }
     if (group != null && !"".equals(group)) {
       consumerBean.setGroup(group);
