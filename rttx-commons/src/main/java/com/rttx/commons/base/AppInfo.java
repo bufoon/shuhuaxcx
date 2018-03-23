@@ -2,6 +2,8 @@ package com.rttx.commons.base;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.io.Serializable;
+
 /**
  * @Author: bufoon
  * @Email: song.anling@zyxr.com
@@ -10,8 +12,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * 应用信息
  */
 @ConfigurationProperties(prefix = "rttx.appInfo")
-public class AppInfo {
+public class AppInfo implements Serializable {
 
+    private static final long serialVersionUID = 4713252663637368049L;
     private int id;
     private String name;
     private String desc;

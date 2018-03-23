@@ -56,7 +56,7 @@ public class AspectRpcLog {
         logger.info("Rpc Service Method Response Info========================\n" +
                         "Method: {} \n" +
                         "AppInfo: appId_{}, appName_{} \n " +
-                        "params: {} \n ", signature.getDeclaringTypeName()+"."+signature.getName(),
+                        "Data: {} \n ", signature.getDeclaringTypeName()+"."+signature.getName(),
                 appInfo.getId(), appInfo.getName(),
                 JSON.toJSONString(returnValue));
     }

@@ -23,7 +23,7 @@ import java.util.Set;
 @Service
 public class RedisCServiceImpl implements RedisCService {
 
-    @Autowired
+    //@Autowired
     private JedisCluster jedisCluster;
 
     @Override

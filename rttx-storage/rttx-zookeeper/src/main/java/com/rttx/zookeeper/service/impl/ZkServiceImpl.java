@@ -50,8 +50,11 @@ public class ZkServiceImpl implements ZkService {
             data = curatorFramework.getData().forPath(getPath(path));
             return new String(data, Charset.defaultCharset());
         } catch (Exception e) {
-            logger.error("zk getData is error {}", ExceptionUtils.getStackTrace(e));
+            if (StringUtils.isEmpty(path) || path.indexOf("commons") > 0){
+                logger.error("zk getData is error {}", ExceptionUtils.getStackTrace(e));
+            }
         } finally {
+            // 如果当前路径没有配置，则从公共模块路径获取
             if (data == null && StringUtils.isNotEmpty(path) && path.indexOf("commons") != -1){
                 return getData(COMMONS_PATH+path);
             }
@@ -90,8 +93,11 @@ public class ZkServiceImpl implements ZkService {
             nodeCache.getListenable().addListener(new NodeCacheGenericListener<>(v, defaultValue, nodeCache));
             nodeCache.start();
         } catch (Exception e) {
-            logger.error("data change error. {}", ExceptionUtils.getStackTrace(e));
+            if (StringUtils.isEmpty(path) || path.indexOf("commons") > 0){
+                logger.error("data change error. {}", ExceptionUtils.getStackTrace(e));
+            }
         } finally {
+            // 如果当前路径没有配置，则从公共模块路径获取
             if (StringUtils.isEmpty(value) && StringUtils.isNotEmpty(path) && path.indexOf("commons") < 0){
                 return getData(COMMONS_PATH + path, v, defaultValue);
             }
