@@ -47,9 +47,6 @@ public class DubboConsumerAutoConfiguration {
   private ApplicationContext applicationContext;
 
   @Autowired
-  private DubboProperties properties;
-
-  @Autowired
   private ApplicationConfig applicationConfig;
   @Autowired
   private RegistryConfig registryConfig;

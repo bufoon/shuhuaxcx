@@ -15,9 +15,26 @@ import java.io.Serializable;
 public class AppInfo implements Serializable {
 
     private static final long serialVersionUID = 4713252663637368049L;
+    /**
+     * 应用ID
+     */
     private int id;
+    /**
+     * 应用名
+     */
     private String name;
+    /**
+     * 应用描述
+     */
     private String desc;
+    /**
+     * 是否引用外部配置，如ZK
+     */
+    private Boolean exConfig = false;
+    /**
+     * ZK配置路径前缀
+     */
+    private String configPath;
 
     public int getId() {
         return id;
@@ -41,5 +58,21 @@ public class AppInfo implements Serializable {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public Boolean getExConfig() {
+        return exConfig;
+    }
+
+    public void setExConfig(Boolean exConfig) {
+        this.exConfig = exConfig;
+    }
+
+    public String getConfigPath() {
+        return configPath;
+    }
+
+    public void setConfigPath(String configPath) {
+        this.configPath = configPath;
     }
 }

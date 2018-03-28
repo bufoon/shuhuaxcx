@@ -1,11 +1,14 @@
 package com.rttx.dfs.config;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
 /**
  * @Author: bufoon
  * @Email: song.anling@zyxr.com
  * @Datetime: Created In 2018/2/27 10:43
  * @Desc: as follows.
  */
+@ConfigurationProperties(prefix = "rttx.dfs")
 public class FastdfsProperties {
     /**
      * 连接超时，默认5秒

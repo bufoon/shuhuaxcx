@@ -1,6 +1,14 @@
 package com.rttx.protocol.rmq.config;
 
+import com.alibaba.fastjson.JSON;
+import com.rttx.commons.base.AppInfo;
+import com.rttx.commons.base.BaseConstants;
+import com.rttx.commons.utils.StringUtils;
 import com.rttx.protocol.rmq.support.FastJsonMessageConverter;
+import com.rttx.zookeeper.service.ZkService;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -17,41 +25,102 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
+import org.yaml.snakeyaml.Yaml;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Configuration
 public class RMQConfig {
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private SimpleRabbitListenerContainerFactoryConfigurer configurer;
 
-    @ConfigurationProperties(prefix = "rttx.protocol.rmq")
-    @Bean("rttxRabbitProperties")
+    private RabbitProperties zkRabbitProperties;
+
+
+    public RMQConfig(ZkService zkService, AppInfo appInfo){
+        // 从构造方法去初始化ZK信息，优先拿到配置数据
+        init(zkService, appInfo);
+    }
+
+    /**
+     * 从ZK获取配置信息
+     */
+    public void init(ZkService zkService, AppInfo appInfo){
+        // 是否引用外部（ZK）配置数据
+        if (appInfo != null && !appInfo.getExConfig()){
+            return;
+        }
+        if (zkService == null){
+            logger.error("ZK service is Null");
+            return;
+        }
+        String yamlStr = zkService.getData(BaseConstants.YUN_WEI + "/protocol/rmq");
+        if (StringUtils.isEmpty(yamlStr)){
+            logger.error("ZK config is Null");
+            return;
+        }
+        Yaml yaml = new Yaml();
+        Map<String, Object> object = yaml.loadAs(yamlStr, LinkedHashMap.class);
+        if (object == null){
+            logger.error("ZK config convert Map Null");
+            return;
+        }
+        RabbitProperties zkProperties = null;
+        try {
+            zkProperties = JSON.parseObject(JSON.toJSONString(object), RabbitProperties.class);
+        } catch (Exception e) {
+            logger.error("ZK config convert Properties Object Error \n{}", ExceptionUtils.getStackTrace(e));
+            return;
+        }
+        if (zkProperties == null){
+            logger.error("ZK config convert Properties Object Null");
+            return;
+        }
+        this.zkRabbitProperties = zkProperties;
+    }
+
+
+    @Bean
     @Primary
     public RabbitProperties rabbitProperties() {
+        if (this.zkRabbitProperties != null){
+            logger.info("【RabbitMQ】读取[ZK]的项目配置**********************************");
+            return zkRabbitProperties;
+        }
+        logger.info("【RabbitMQ】读取本地的项目配置**********************************");
+        return localRabbitProperties();
+    }
+
+    @ConfigurationProperties(prefix = "rttx.protocol.rmq")
+    @Bean
+    public RabbitProperties localRabbitProperties() {
         return new RabbitProperties();
     }
 
     @Bean("rttxRabbitConnectionFactory")
-    public CachingConnectionFactory rabbitConnectionFactory(@Qualifier("rttxRabbitProperties") RabbitProperties config)
+    public CachingConnectionFactory rabbitConnectionFactory(RabbitProperties rabbitProperties)
             throws Exception {
         RabbitConnectionFactoryBean factory = new RabbitConnectionFactoryBean();
-        if (config.determineHost() != null) {
-            factory.setHost(config.determineHost());
+        if (rabbitProperties.determineHost() != null) {
+            factory.setHost(rabbitProperties.determineHost());
         }
-        factory.setPort(config.determinePort());
-        if (config.determineUsername() != null) {
-            factory.setUsername(config.determineUsername());
+        factory.setPort(rabbitProperties.determinePort());
+        if (rabbitProperties.determineUsername() != null) {
+            factory.setUsername(rabbitProperties.determineUsername());
         }
-        if (config.determinePassword() != null) {
-            factory.setPassword(config.determinePassword());
+        if (rabbitProperties.determinePassword() != null) {
+            factory.setPassword(rabbitProperties.determinePassword());
         }
-        if (config.determineVirtualHost() != null) {
-            factory.setVirtualHost(config.determineVirtualHost());
+        if (rabbitProperties.determineVirtualHost() != null) {
+            factory.setVirtualHost(rabbitProperties.determineVirtualHost());
         }
-        if (config.getRequestedHeartbeat() != null) {
-            factory.setRequestedHeartbeat(config.getRequestedHeartbeat());
+        if (rabbitProperties.getRequestedHeartbeat() != null) {
+            factory.setRequestedHeartbeat(rabbitProperties.getRequestedHeartbeat());
         }
-        RabbitProperties.Ssl ssl = config.getSsl();
+        RabbitProperties.Ssl ssl = rabbitProperties.getSsl();
         if (ssl.isEnabled()) {
             factory.setUseSSL(true);
             if (ssl.getAlgorithm() != null) {
@@ -62,30 +131,30 @@ public class RMQConfig {
             factory.setTrustStore(ssl.getTrustStore());
             factory.setTrustStorePassphrase(ssl.getTrustStorePassword());
         }
-        if (config.getConnectionTimeout() != null) {
-            factory.setConnectionTimeout(config.getConnectionTimeout());
+        if (rabbitProperties.getConnectionTimeout() != null) {
+            factory.setConnectionTimeout(rabbitProperties.getConnectionTimeout());
         }
         factory.afterPropertiesSet();
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory(
                 factory.getObject());
-        connectionFactory.setAddresses(config.determineAddresses());
-        connectionFactory.setPublisherConfirms(config.isPublisherConfirms());
-        connectionFactory.setPublisherReturns(config.isPublisherReturns());
-        if (config.getCache().getChannel().getSize() != null) {
+        connectionFactory.setAddresses(rabbitProperties.determineAddresses());
+        connectionFactory.setPublisherConfirms(rabbitProperties.isPublisherConfirms());
+        connectionFactory.setPublisherReturns(rabbitProperties.isPublisherReturns());
+        if (rabbitProperties.getCache().getChannel().getSize() != null) {
             connectionFactory
-                    .setChannelCacheSize(config.getCache().getChannel().getSize());
+                    .setChannelCacheSize(rabbitProperties.getCache().getChannel().getSize());
         }
-        if (config.getCache().getConnection().getMode() != null) {
+        if (rabbitProperties.getCache().getConnection().getMode() != null) {
             connectionFactory
-                    .setCacheMode(config.getCache().getConnection().getMode());
+                    .setCacheMode(rabbitProperties.getCache().getConnection().getMode());
         }
-        if (config.getCache().getConnection().getSize() != null) {
+        if (rabbitProperties.getCache().getConnection().getSize() != null) {
             connectionFactory.setConnectionCacheSize(
-                    config.getCache().getConnection().getSize());
+                    rabbitProperties.getCache().getConnection().getSize());
         }
-        if (config.getCache().getChannel().getCheckoutTimeout() != null) {
+        if (rabbitProperties.getCache().getChannel().getCheckoutTimeout() != null) {
             connectionFactory.setChannelCheckoutTimeout(
-                    config.getCache().getChannel().getCheckoutTimeout());
+                    rabbitProperties.getCache().getChannel().getCheckoutTimeout());
         }
         return connectionFactory;
     }

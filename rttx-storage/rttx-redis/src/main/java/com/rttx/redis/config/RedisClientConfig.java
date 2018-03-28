@@ -1,12 +1,18 @@
 package com.rttx.redis.config;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.support.spring.GenericFastJsonRedisSerializer;
+import com.rttx.commons.base.AppInfo;
+import com.rttx.commons.base.BaseConstants;
+import com.rttx.commons.utils.StringUtils;
 import com.rttx.redis.support.CustomRedisProperties;
+import com.rttx.zookeeper.service.ZkService;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +21,10 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.yaml.snakeyaml.Yaml;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @Author: bufoon
@@ -23,12 +33,60 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  * @Desc: as follows.
  */
 @Configuration
-@ConditionalOnProperty(name = "rttx.storage.redis.enable", havingValue = "true")
 @EnableConfigurationProperties(CustomRedisProperties.class)
 public class RedisClientConfig {
 
-    @Autowired
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
     private CustomRedisProperties properties;
+
+    public RedisClientConfig(ZkService zkService, AppInfo appInfo, CustomRedisProperties customRedisProperties){
+        this.init(appInfo, zkService);
+        if (this.properties == null){
+            this.properties = customRedisProperties;
+            logger.info("【Redis】读取本地的项目配置**********************************");
+        } else {
+            logger.info("【Redis】读取[ZK]的项目配置**********************************");
+        }
+    }
+
+    /**
+     * 初始化，如果ZK配置有信息，则从ZK中获取信息
+     */
+    public void init(AppInfo appInfo, ZkService zkService){
+        if (appInfo != null && !appInfo.getExConfig()){
+            return;
+        }
+        if (zkService == null){
+            logger.error("ZK service is Null");
+            return;
+        }
+        //zkService.mkDir(BaseConstants.YUN_WEI + "/storage/redis");
+        String redisYamlStr = zkService.getData(BaseConstants.YUN_WEI + "/storage/redis");
+        if (StringUtils.isEmpty(redisYamlStr)){
+            logger.error("ZK config is Null");
+            return;
+        }
+        Yaml yaml = new Yaml();
+        Map<String, Object> object = yaml.loadAs(redisYamlStr, LinkedHashMap.class);
+        if (object == null){
+            logger.error("ZK config convert Map Null");
+            return;
+        }
+        CustomRedisProperties zkProperties = null;
+        try {
+            zkProperties = JSON.parseObject(JSON.toJSONString(object), CustomRedisProperties.class);
+        } catch (Exception e) {
+            logger.error("ZK config convert Properties Object Error \n{}", ExceptionUtils.getStackTrace(e));
+            return;
+        }
+        if (zkProperties == null){
+            logger.error("ZK config convert Properties Object Null");
+            return;
+        }
+        this.properties = zkProperties;
+
+    }
 
     /**
      * redisson Client
@@ -80,13 +138,17 @@ public class RedisClientConfig {
      */
     @Bean
     @Primary
-    @ConditionalOnProperty(name = "rttx.storage.redis.jedis.enable", havingValue = "true")
     public RedisProperties redisProperties(){
+        if (this.properties.getJedis() == null){
+            return new RedisProperties();
+        }
         return this.properties.getJedis();
     }
     @Bean
-    @ConditionalOnProperty(name = "rttx.storage.redis.jedis.enable", havingValue = "true")
     public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        if (redisConnectionFactory == null){
+            return null;
+        }
         RedisTemplate<Object, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
         template.setKeySerializer(new StringRedisSerializer());

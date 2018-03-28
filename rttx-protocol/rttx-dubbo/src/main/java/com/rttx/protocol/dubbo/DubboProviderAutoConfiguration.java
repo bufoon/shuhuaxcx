@@ -34,9 +34,6 @@ public class DubboProviderAutoConfiguration {
   private ApplicationContext applicationContext;
 
   @Autowired
-  private DubboProperties properties;
-
-  @Autowired
   private ApplicationConfig applicationConfig;
 
   @Autowired

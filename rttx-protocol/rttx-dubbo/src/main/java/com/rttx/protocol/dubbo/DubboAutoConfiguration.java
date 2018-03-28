@@ -3,21 +3,31 @@ package com.rttx.protocol.dubbo;
 import com.alibaba.dubbo.config.ApplicationConfig;
 import com.alibaba.dubbo.config.ProtocolConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
+import com.alibaba.dubbo.qos.common.Constants;
+import com.alibaba.fastjson.JSON;
 import com.rttx.commons.base.AppInfo;
+import com.rttx.commons.base.BaseConstants;
+import com.rttx.commons.utils.StringUtils;
 import com.rttx.protocol.dubbo.endpoint.DubboEndpoint;
 import com.rttx.protocol.dubbo.endpoint.DubboOperationEndpoint;
 import com.rttx.protocol.dubbo.health.DubboHealthIndicator;
 import com.rttx.protocol.dubbo.metrics.DubboMetrics;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.rttx.zookeeper.service.ZkService;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.yaml.snakeyaml.Yaml;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Dubbo common configuration
@@ -30,15 +40,63 @@ import java.net.Socket;
 @EnableConfigurationProperties({DubboProperties.class, AppInfo.class})
 @Order(-1)
 public class DubboAutoConfiguration {
-  @Autowired
+  private Logger logger = LoggerFactory.getLogger(getClass());
+
   private DubboProperties properties;
-  @Autowired
   private AppInfo appInfo;
+
+  public DubboAutoConfiguration(ZkService zkService, AppInfo appInfo, DubboProperties localProperties){
+    // 从构造方法去初始化ZK信息，优先拿到配置数据
+    this.appInfo = appInfo;
+    this.init(zkService, appInfo);
+    if (this.properties == null){
+      this.properties = localProperties;
+      logger.info("【Dubbo】读取本地的项目配置**********************************");
+    } else {
+      logger.info("【Dubbo】读取[ZK]的项目配置**********************************");
+    }
+  }
+
+  /**
+   * 从ZK获取配置信息
+   */
+  public void init(ZkService zkService, AppInfo appInfo){
+    // 是否引用外部（ZK）配置数据
+    if (appInfo != null && !appInfo.getExConfig()){
+      return;
+    }
+    if (zkService == null){
+      logger.error("ZK service is Null");
+      return;
+    }
+    String yamlStr = zkService.getData(BaseConstants.YUN_WEI + "/protocol/dubbo");
+    if (StringUtils.isEmpty(yamlStr)){
+      logger.error("ZK config is Null");
+      return;
+    }
+    Yaml yaml = new Yaml();
+    Map<String, Object> object = yaml.loadAs(yamlStr, LinkedHashMap.class);
+    if (object == null){
+      logger.error("ZK config convert Map Null");
+      return;
+    }
+    DubboProperties zkProperties = null;
+    try {
+      zkProperties = JSON.parseObject(JSON.toJSONString(object), DubboProperties.class);
+    } catch (Exception e) {
+      logger.error("ZK config convert Properties Object Error \n{}", ExceptionUtils.getStackTrace(e));
+      return;
+    }
+    if (zkProperties == null){
+      logger.error("ZK config convert Properties Object Null");
+      return;
+    }
+    this.properties = zkProperties;
+  }
 
   @Bean
   @ConditionalOnMissingBean
   public ApplicationConfig dubboApplicationConfig() {
-
     ApplicationConfig appConfig = this.properties.getApplication();
     if (appConfig == null){
       appConfig = new ApplicationConfig();

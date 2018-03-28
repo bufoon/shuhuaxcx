@@ -1,16 +1,17 @@
 package com.rttx.zookeeper.prop;
 
-import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * Zookeeper 客户端连接属性
  */
+@ConfigurationProperties(prefix = "rttx.storage.zookeeper")
 public class CuratorProperties {
     private String zkAddress; //zk连接地址，多个用逗号隔开
-    private int retryCount; // 连接重试次数
-    private int sleepTimes; // 重试间隔 毫秒
+    private int retryCount = 5; // 连接重试次数
+    private int sleepTimes = 3000; // 重试间隔 毫秒
     private int sessionTimeout = 60*1000; // 会话超时时间，毫秒，默认60秒
-    private int connectionTimeout = 15*1000; //建立连接超时时间，毫秒，默认15秒
+    private int connectionTimeout = 30*1000; //建立连接超时时间，毫秒，默认15秒
 
     public String getZkAddress() {
         return zkAddress;
